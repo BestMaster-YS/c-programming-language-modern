@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#define ORDER 1
+#define REV_ORDER 0
 
 struct node
 {
@@ -21,14 +23,15 @@ void add_to_list_headV2(struct node **list, int n);
 struct node *read_numbers(void);
 struct node *search_list(struct node *list, int n);
 struct node *delete_from_list(struct node *list, int n);
+void reorderList(struct node *list);
+struct node* reorderListRec(struct node *head, int);
+void print_list(struct node *list);
 
 int main() {
-    struct node *first = NULL;
-    struct node *new_node;
-    new_node = malloc(sizeof(struct node));
-    new_node->value = 10;
-    printf("%d\n", new_node->value);
-    printf("%d\n", &new_node->value);
+    struct node* head = read_numbers();
+    print_list(head);
+    reorderList(head);
+    print_list(head);
     return 0;
 }
 
@@ -100,3 +103,35 @@ void add_to_list_headV2(struct node **list, int n) {
     new_node->next = *list;
     *list = new_node;
 }
+
+void reorderList(struct node *head) {
+    head = reorderListRec(head, ORDER);
+}
+
+struct node* reorderListRec(struct node* head, int order) {
+    if (order) {
+        struct node* next = head->next;
+        head->next = reorderListRec(next, REV_ORDER);
+        return head;
+    } else {
+        struct node* last = head;
+        struct node* preLast = NULL;
+        while (last->next) {
+            if (last->next->next == NULL) {
+                preLast = last;
+            }
+            last = last->next;
+        }
+        last->next = reorderListRec(head, ORDER);
+        return last;
+    }
+}
+
+void print_list(struct node* list) {
+    struct node* head = list;
+    while(head) {
+        printf("%d -> ", head->value);
+        head = head->next;
+    }
+}
+
